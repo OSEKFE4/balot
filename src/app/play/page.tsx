@@ -89,59 +89,40 @@ export default function PlayPage() {
 
   if (!isJoined) {
     return (
-      <div className="min-h-screen bg-primary relative flex items-center justify-center p-8 overflow-hidden">
-        {/* Background stripes for texture */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none">
-          <div className="w-full h-full bg-[repeating-linear-gradient(45deg,_#000,_#000_100px,_transparent_100px,_transparent_200px)]"></div>
-        </div>
+      <div style={{ backgroundColor: '#1a4d2e', minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', direction: 'rtl' }}>
         <Lobby onJoin={handleJoin} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#e8e1d5] flex flex-col items-center justify-between p-0 relative overflow-hidden font-sans">
+    <div style={{ backgroundColor: '#e8e1d5', minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', direction: 'rtl', overflow: 'hidden' }}>
       {/* Top Bar - Score and Menu */}
-      <div className="w-full bg-[#3a3a3a] text-white p-2 flex flex-col gap-1 shadow-lg z-50 border-b border-black/20">
-        <div className="flex justify-between items-center px-4">
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
-              <div className="bg-white/10 p-1.5 rounded-lg"><Chat size={18} /></div>
-              <span className="text-[9px] mt-0.5">الدردشة</span>
-            </div>
-            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
-              <div className="bg-white/10 p-1.5 rounded-lg"><Users size={18} /></div>
-              <span className="text-[9px] mt-0.5">مشاركة</span>
-            </div>
-          </div>
+      <div style={{ backgroundColor: '#333', color: 'white', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.3)', zIndex: 100 }}>
+        <div style={{ display: 'flex', gap: '20px' }}>
+           <span style={{ opacity: 0.7 }}>الإعدادات</span>
+           <span style={{ opacity: 0.7 }}>الدردشة</span>
+        </div>
 
-          <div className="flex items-center bg-[#2a2a2a] rounded-2xl px-6 py-1.5 gap-6 border-2 border-white/5 shadow-inner">
-            <div className="flex flex-col items-center border-l-2 border-white/10 pl-6">
-              <span className="text-[10px] text-white/40 font-bold">لنا</span>
-              <span className="text-2xl font-black text-white leading-none">{gameState.scores[0]}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-[10px] text-white/40 font-bold">لهم</span>
-              <span className="text-2xl font-black text-white leading-none">{gameState.scores[1]}</span>
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: '5px 20px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: '15px', textAlign: 'center' }}>
+            <div style={{ fontSize: '10px', color: '#aaa' }}>لنا</div>
+            <div style={{ fontSize: '24px', fontWeight: '900', color: '#d4af37' }}>{gameState.scores[0]}</div>
           </div>
+          <div style={{ paddingRight: '15px', textAlign: 'center' }}>
+            <div style={{ fontSize: '10px', color: '#aaa' }}>لهم</div>
+            <div style={{ fontSize: '24px', fontWeight: '900', color: '#d4af37' }}>{gameState.scores[1]}</div>
+          </div>
+        </div>
 
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
-              <div className="bg-white/10 p-1.5 rounded-lg"><Trophy size={18} /></div>
-              <span className="text-[9px] mt-0.5">البطولات</span>
-            </div>
-            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
-              <div className="bg-white/10 p-1.5 rounded-lg"><Play size={18} /></div>
-              <span className="text-[9px] mt-0.5">خروج</span>
-            </div>
-          </div>
+        <div style={{ display: 'flex', gap: '20px' }}>
+           <span style={{ color: '#d4af37', fontWeight: 'bold' }}>أبو هذال</span>
         </div>
       </div>
 
       {/* Main Table Area */}
-      <div className="flex-1 w-full relative flex items-center justify-center p-2">
-        <div className="w-full h-full max-w-2xl z-10 flex items-center justify-center">
+      <div style={{ flex: 1, width: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
+        <div style={{ width: '100%', maxWidth: '600px', height: '100%', maxHeight: '600px', position: 'relative' }}>
           <GameBoard 
             players={gameState.players}
             tableCards={gameState.tableCards}
@@ -151,17 +132,11 @@ export default function PlayPage() {
       </div>
 
       {/* Action Buttons - Bottom */}
-      <div className="w-full bg-[#333333] p-4 flex flex-col gap-4 z-50 rounded-t-[30px] shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
-        <div className="flex justify-center items-center gap-2 mb-2">
-            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-            <span className="text-white/60 text-xs">خلك ملك</span>
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          <button className="bg-[#5a5a5a] text-white font-bold py-4 rounded-xl shadow-inner border-b-4 border-black/40 active:border-b-0 active:translate-y-1 transition-all">صن</button>
-          <button className="bg-[#5a5a5a] text-white font-bold py-4 rounded-xl shadow-inner border-b-4 border-black/40 active:border-b-0 active:translate-y-1 transition-all">حكم</button>
-          <button className="bg-[#5a5a5a] text-white font-bold py-4 rounded-xl shadow-inner border-b-4 border-black/40 active:border-b-0 active:translate-y-1 transition-all">أشكل</button>
-          <button className="bg-[#5a5a5a] text-white font-bold py-4 rounded-xl shadow-inner border-b-4 border-black/40 active:border-b-0 active:translate-y-1 transition-all">بس</button>
-        </div>
+      <div style={{ backgroundColor: '#222', padding: '20px', display: 'flex', justifyContent: 'center', gap: '10px', borderRadius: '30px 30px 0 0', boxShadow: '0 -5px 20px rgba(0,0,0,0.4)' }}>
+          <button style={{ backgroundColor: '#555', color: 'white', fontWeight: 'bold', padding: '15px 30px', borderRadius: '12px', border: 'none', minWidth: '80px', cursor: 'pointer', borderBottom: '4px solid #333' }}>صن</button>
+          <button style={{ backgroundColor: '#555', color: 'white', fontWeight: 'bold', padding: '15px 30px', borderRadius: '12px', border: 'none', minWidth: '80px', cursor: 'pointer', borderBottom: '4px solid #333' }}>حكم</button>
+          <button style={{ backgroundColor: '#555', color: 'white', fontWeight: 'bold', padding: '15px 30px', borderRadius: '12px', border: 'none', minWidth: '80px', cursor: 'pointer', borderBottom: '4px solid #333' }}>أشكل</button>
+          <button style={{ backgroundColor: '#555', color: 'white', fontWeight: 'bold', padding: '15px 30px', borderRadius: '12px', border: 'none', minWidth: '80px', cursor: 'pointer', borderBottom: '4px solid #333' }}>بس</button>
       </div>
     </div>
   );
