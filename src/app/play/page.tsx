@@ -33,12 +33,20 @@ export default function BalootGame() {
   const [tableCards, setTableCards] = useState<any[]>([]);
   const [turn, setTurn] = useState(0); 
   const [gameStatus, setGameStatus] = useState('WAITING');
-  const [scores, setScores] = useState([0, 0]); // لنا، لهم
+  const [scores, setScores] = useState([0, 0]);
   const [roundPoints, setRoundPoints] = useState([0, 0]);
   const [showNashra, setShowNashra] = useState(false);
   const [project, setProject] = useState<string | null>(null);
+  
+  // New Bidding States
+  const [upCard, setUpCard] = useState<any>(null);
+  const [biddingRound, setBiddingRound] = useState(1); // 1: First Round, 2: Second Round
+  const [bidHistory, setBidHistory] = useState<string[]>([]);
+  const [buyer, setBuyer] = useState<number | null>(null);
+  const [gameType, setGameType] = useState<'SUN' | 'HUKM' | null>(null);
+  const [deck, setDeck] = useState<any[]>([]);
 
-  // Animated Dealing Sequence (3-2)
+  // Initial Game Setup - Stage 1 (Dealing 5 cards and UpCard)
   const startNewGame = async () => {
     setIsJoined(true);
     setIsDealing(true);
@@ -47,24 +55,81 @@ export default function BalootGame() {
     setTableCards([]);
     setRoundPoints([0, 0]);
     setProject(null);
+    setBiddingRound(1);
+    setBidHistory([]);
+    setBuyer(null);
+    setGameType(null);
     
-    const deck = createBalootDeck();
+    const newDeck = createBalootDeck();
+    setDeck(newDeck);
     
-    // Simulate animated dealing to 4 players
+    // Deal 5 cards to me
     for (let i = 0; i < 5; i++) {
-      await new Promise(r => setTimeout(r, 300));
-      setMyCards(prev => [...prev, deck[i]]);
+      await new Promise(r => setTimeout(r, 200));
+      setMyCards(prev => [...prev, newDeck[i]]);
     }
     
-    // Check for Projects (Mock for now)
-    const projects = ['سرا', 'خمسين', 'مية', 'اربعمية'];
-    if (Math.random() > 0.7) {
-      setTimeout(() => setProject(projects[Math.floor(Math.random() * projects.length)]), 1000);
-    }
-
+    // Set UpCard (the 21st card usually, but here we take the next one)
+    setUpCard(newDeck[20]);
+    
     setIsDealing(false);
+    setGameStatus('BIDDING');
+    setTurn(0); // Bidding starts from player after dealer (simplified to start from me)
+  };
+
+  // Bot Bidding Logic
+  useEffect(() => {
+    if (isJoined && turn !== 0 && gameStatus === 'BIDDING' && !isDealing) {
+      const botBiddingTimer = setTimeout(() => {
+        handleBotBid();
+      }, 1500);
+      return () => clearTimeout(botBiddingTimer);
+    }
+  }, [turn, isJoined, gameStatus, isDealing]);
+
+  const handleBotBid = () => {
+    // Simple Bot Logic: 10% chance to buy Sun, 10% Hukm, 80% Pass
+    const rand = Math.random();
+    if (rand < 0.1) {
+      buy('SUN', turn);
+    } else if (rand < 0.2) {
+      buy('HUKM', turn);
+    } else {
+      pass();
+    }
+  };
+
+  const buy = (type: 'SUN' | 'HUKM', playerIdx: number) => {
+    setBuyer(playerIdx);
+    setGameType(type);
     setGameStatus('PLAYING');
-    setTurn(0);
+    
+    // Final Deal: Give remaining cards (3 each, buyer gets 2 + upCard)
+    const remainingCards = deck.slice(21, 32); // Remaining cards after initial 20 + upcard
+    // Simplified: Just give me 3 more if I bought, or whatever
+    if (playerIdx === 0) {
+      setMyCards(prev => [...prev, upCard, ...deck.slice(21, 23)]);
+    } else {
+      setMyCards(prev => [...prev, ...deck.slice(21, 24)]);
+    }
+    
+    setTurn(0); // Playing starts from player after dealer
+  };
+
+  const pass = () => {
+    const nextTurn = (turn + 1) % 4;
+    setBidHistory(prev => [...prev, 'بس']);
+    
+    if (nextTurn === 0) {
+      if (biddingRound === 1) {
+        setBiddingRound(2);
+      } else {
+        // Everyone passed in Round 2 - Redeal
+        startNewGame();
+        return;
+      }
+    }
+    setTurn(nextTurn);
   };
 
   const copyInviteLink = () => {
@@ -195,8 +260,17 @@ export default function BalootGame() {
            <div style={{ position: 'absolute', inset: 0, opacity: 0.3, background: 'repeating-linear-gradient(0deg, #000, #000 5px, #8b0000 5px, #8b0000 10px)' }}></div>
            
            <div style={{ backgroundColor: 'rgba(255,255,255,0.95)', padding: '10px 25px', borderRadius: '8px', fontWeight: '900', color: '#1a4d2e', zIndex: 10, fontSize: '18px', boxShadow: '0 5px 15px rgba(0,0,0,0.2)', position: 'relative' }}>
-              {isDealing ? 'جارِ التوزيع...' : (turn === 0 ? 'دورك' : 'دور الخصم...')}
+              {gameStatus === 'BIDDING' ? (biddingRound === 1 ? 'أول' : 'ثاني') : (isDealing ? 'جارِ التوزيع...' : (turn === 0 ? 'دورك' : 'دور الخصم...'))}
               
+              {/* UpCard during bidding */}
+              {gameStatus === 'BIDDING' && upCard && (
+                <div style={{ position: 'absolute', bottom: '-100px', left: '50%', transform: 'translateX(-50%)', width: '55px', height: '85px', backgroundColor: 'white', borderRadius: '6px', border: '2px solid #d4af37', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '5px', boxShadow: '0 5px 20px rgba(0,0,0,0.3)' }}>
+                    <div style={{ color: upCard.color, fontWeight: 'bold', fontSize: '14px' }}>{upCard.rank}</div>
+                    <div style={{ color: upCard.color, fontSize: '24px', textAlign: 'center' }}>{upCard.suit}</div>
+                    <div style={{ color: upCard.color, fontWeight: 'bold', fontSize: '14px', transform: 'rotate(180deg)' }}>{upCard.rank}</div>
+                </div>
+              )}
+
               {/* Projects Indicator */}
               {project && (
                 <div style={{ position: 'absolute', top: '-50px', left: '50%', transform: 'translateX(-50%)', backgroundColor: '#d4af37', color: 'white', padding: '5px 15px', borderRadius: '10px', fontSize: '14px', animation: 'bounce 1s infinite', whiteSpace: 'nowrap' }}>
@@ -261,11 +335,20 @@ export default function BalootGame() {
 
       {/* Bottom Controls */}
       <div style={{ backgroundColor: '#222', padding: '20px', display: 'flex', justifyContent: 'center', gap: '10px', borderTop: '4px solid #444' }}>
-         {['صن', 'حكم', 'أشكل', 'بس'].map(btn => (
-           <button key={btn} style={{ flex: 1, maxWidth: '110px', backgroundColor: '#555', color: 'white', border: 'none', padding: '18px 0', borderRadius: '12px', fontWeight: '900', fontSize: '18px', borderBottom: '5px solid #333', cursor: 'pointer' }}>
-             {btn}
-           </button>
-         ))}
+         {gameStatus === 'BIDDING' ? (
+           <>
+              <button onClick={() => buy('SUN', 0)} style={{ flex: 1, maxWidth: '110px', backgroundColor: '#555', color: 'white', border: 'none', padding: '18px 0', borderRadius: '12px', fontWeight: '900', fontSize: '18px', borderBottom: '5px solid #333', cursor: 'pointer' }}>صن</button>
+              <button onClick={() => buy('HUKM', 0)} style={{ flex: 1, maxWidth: '110px', backgroundColor: '#555', color: 'white', border: 'none', padding: '18px 0', borderRadius: '12px', fontWeight: '900', fontSize: '18px', borderBottom: '5px solid #333', cursor: 'pointer' }}>حكم</button>
+              {biddingRound === 2 && <button onClick={() => buy('HUKM', 0)} style={{ flex: 1, maxWidth: '110px', backgroundColor: '#555', color: 'white', border: 'none', padding: '18px 0', borderRadius: '12px', fontWeight: '900', fontSize: '18px', borderBottom: '5px solid #333', cursor: 'pointer' }}>أشكل</button>}
+              <button onClick={pass} style={{ flex: 1, maxWidth: '110px', backgroundColor: '#555', color: 'white', border: 'none', padding: '18px 0', borderRadius: '12px', fontWeight: '900', fontSize: '18px', borderBottom: '5px solid #333', cursor: 'pointer' }}>بس</button>
+           </>
+         ) : (
+           ['صن', 'حكم', 'أشكل', 'بس'].map(btn => (
+             <button key={btn} style={{ flex: 1, maxWidth: '110px', backgroundColor: '#555', color: 'white', border: 'none', padding: '18px 0', borderRadius: '12px', fontWeight: '900', fontSize: '18px', borderBottom: '5px solid #333', cursor: 'pointer' }}>
+               {btn}
+             </button>
+           ))
+         )}
       </div>
     </div>
   );
