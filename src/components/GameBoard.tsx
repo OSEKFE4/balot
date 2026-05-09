@@ -11,14 +11,23 @@ interface GameBoardProps {
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({ players, tableCards, currentPlayerId }) => {
+  // Use a fixed set of players if list is empty for visual testing
+  const displayPlayers = players.length > 0 ? players : [
+    { id: '1', name: 'أنت', cards: [], team: 0 },
+    { id: '2', name: 'خالد', cards: [], team: 1 },
+    { id: '3', name: 'فهد', cards: [], team: 0 },
+    { id: '4', name: 'سلطان', cards: [], team: 1 },
+  ] as Player[];
+
   // Rotate players so current player is at the bottom
-  const myIndex = players.findIndex(p => p.id === currentPlayerId);
-  const rotatedPlayers = [...players.slice(myIndex), ...players.slice(0, myIndex)];
+  const myIndex = displayPlayers.findIndex(p => p.id === currentPlayerId);
+  const safeMyIndex = myIndex === -1 ? 0 : myIndex;
+  const rotatedPlayers = [...displayPlayers.slice(safeMyIndex), ...displayPlayers.slice(0, safeMyIndex)];
 
   const positions = ['bottom', 'left', 'top', 'right'];
 
   return (
-    <div className="relative w-full h-[600px] bg-primary-dark/40 rounded-[100px] border-8 border-primary-dark/60 shadow-2xl flex items-center justify-center overflow-hidden">
+    <div className="relative w-full aspect-[16/10] max-h-[70vh] bg-primary-dark/40 rounded-[100px] border-8 border-primary-dark/60 shadow-2xl flex items-center justify-center overflow-hidden">
       {/* The Felt Table */}
       <div className="absolute inset-10 border-4 border-white/5 rounded-[80px]"></div>
 

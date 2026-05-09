@@ -63,15 +63,24 @@ export default function PlayPage() {
 
   if (!isJoined) {
     return (
-      <div className="min-h-screen bg-primary flex items-center justify-center p-8">
+      <div className="min-h-screen bg-primary relative flex items-center justify-center p-8 overflow-hidden">
+        {/* Background stripes for texture */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
+          <div className="w-full h-full bg-[repeating-linear-gradient(45deg,_#000,_#000_100px,_transparent_100px,_transparent_200px)]"></div>
+        </div>
         <Lobby onJoin={handleJoin} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-primary flex flex-col items-center justify-center p-8">
-      <div className="w-full max-w-6xl">
+    <div className="min-h-screen bg-primary flex flex-col items-center justify-center p-8 relative overflow-hidden">
+      {/* Background stripes for texture */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="w-full h-full bg-[repeating-linear-gradient(45deg,_#000,_#000_100px,_transparent_100px,_transparent_200px)]"></div>
+      </div>
+
+      <div className="w-full max-w-7xl z-10">
         <div className="flex justify-between items-center mb-8 text-white">
           <div className="bg-black/20 px-6 py-2 rounded-full font-bold">
             الفريق 1: <span className="text-secondary">{gameState.scores[0]}</span>
