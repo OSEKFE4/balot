@@ -100,41 +100,50 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="min-h-screen bg-primary flex flex-col items-center justify-center p-8 relative overflow-hidden">
-      {/* Background stripes for texture */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="w-full h-full bg-[repeating-linear-gradient(45deg,_#000,_#000_100px,_transparent_100px,_transparent_200px)]"></div>
-      </div>
+    <div className="min-h-screen bg-[#064e3b] flex flex-col items-center justify-start p-4 md:p-8 relative overflow-x-hidden">
+      {/* Background texture */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]"></div>
 
-      <div className="w-full max-w-7xl z-10">
-        <div className="flex justify-between items-center mb-8 text-white">
-          <div className="bg-black/20 px-6 py-2 rounded-full font-bold">
-            الفريق 1: <span className="text-secondary">{gameState.scores[0]}</span>
+      <div className="w-full max-w-6xl z-10 flex flex-col gap-6">
+        {/* Header Stats */}
+        <div className="flex justify-between items-center bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-xl">
+          <div className="flex flex-col items-center">
+            <span className="text-white/60 text-xs mb-1">فريقنا</span>
+            <span className="text-secondary text-2xl font-black">{gameState.scores[0]}</span>
           </div>
-          <h2 className="text-2xl font-black text-secondary">طاولة: {gameState.status}</h2>
-          <div className="bg-black/20 px-6 py-2 rounded-full font-bold">
-            الفريق 2: <span className="text-secondary">{gameState.scores[1]}</span>
+          <div className="text-center">
+            <h2 className="text-secondary font-black text-xl mb-1">أبو هذال</h2>
+            <div className="px-4 py-1 bg-white/10 rounded-full text-white/80 text-xs font-bold uppercase tracking-widest">
+              {gameState.status}
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-white/60 text-xs mb-1">فريقهم</span>
+            <span className="text-secondary text-2xl font-black">{gameState.scores[1]}</span>
           </div>
         </div>
 
-        <div className="flex gap-8 items-start">
-          <div className="flex-1">
+        {/* Main Game Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+          <div className="lg:col-span-3 w-full">
             <GameBoard 
               players={gameState.players}
               tableCards={gameState.tableCards}
-              currentPlayerId={socket?.id || ''}
+              currentPlayerId={socket?.id || 'me'}
             />
           </div>
-          <Chat />
+          
+          <div className="w-full lg:col-span-1 h-full">
+            <Chat />
+          </div>
         </div>
 
-        {gameState.status === 'BIDDING' && (
-          <div className="mt-8 flex gap-4 justify-center">
-            <button className="btn-primary">صن</button>
-            <button className="btn-primary bg-primary-dark text-white border-2 border-secondary">حكم</button>
-            <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-8 rounded-full">بس</button>
-          </div>
-        )}
+        {/* Action Controls */}
+        <div className="flex gap-4 justify-center mt-4">
+          <button className="btn-primary shadow-[0_0_20px_rgba(212,175,55,0.3)]">صن</button>
+          <button className="bg-primary-dark text-white border-2 border-secondary font-bold py-2 px-8 rounded-full hover:bg-secondary hover:text-primary-dark transition-all">حكم</button>
+          <button className="bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/50 font-bold py-2 px-8 rounded-full transition-all">بس</button>
+        </div>
       </div>
     </div>
   );
