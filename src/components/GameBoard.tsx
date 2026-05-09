@@ -25,56 +25,69 @@ export const GameBoard: React.FC<GameBoardProps> = ({ players, tableCards, curre
   const positions = ['bottom', 'left', 'top', 'right'];
 
   return (
-    <div className="relative w-full h-[500px] md:h-[650px] bg-[#0f3d24] rounded-[50px] md:rounded-[100px] border-[12px] border-[#081c15] shadow-[0_0_100px_rgba(0,0,0,0.5)] flex items-center justify-center overflow-hidden">
-      {/* The Felt Table Surface */}
-      <div className="absolute inset-4 md:inset-8 border-2 border-white/10 rounded-[40px] md:rounded-[80px] bg-gradient-to-b from-white/5 to-transparent"></div>
-
+    <div className="relative w-full h-full flex items-center justify-center">
       {/* Players */}
       {rotatedPlayers.map((player, i) => (
         <div 
           key={player.id}
-          className={`absolute flex flex-col items-center gap-2 ${
-            positions[i] === 'bottom' ? 'bottom-8' :
-            positions[i] === 'top' ? 'top-8' :
-            positions[i] === 'left' ? 'left-8 rotate-90' : 'right-8 -rotate-90'
+          className={`absolute flex flex-col items-center gap-1 ${
+            positions[i] === 'bottom' ? 'bottom-2 w-full' :
+            positions[i] === 'top' ? 'top-2' :
+            positions[i] === 'left' ? 'left-2 -rotate-90 origin-center' : 'right-2 rotate-90 origin-center'
           }`}
         >
-          <div className="w-16 h-16 bg-secondary rounded-full border-4 border-primary shadow-lg flex items-center justify-center text-primary-dark font-black text-xl">
-            {player.name[0].toUpperCase()}
+          {/* Avatar and Info */}
+          <div className="flex flex-col items-center scale-75 md:scale-100">
+            <div className="w-12 h-12 bg-gray-400 rounded-full border-2 border-white/50 overflow-hidden shadow-lg relative">
+               <div className="absolute inset-0 bg-black/20"></div>
+               <span className="absolute inset-0 flex items-center justify-center text-white font-bold">{player.name[0]}</span>
+            </div>
+            <div className="bg-black/60 px-2 py-0.5 rounded text-[10px] text-white mt-1 whitespace-nowrap">
+                {player.name}
+            </div>
           </div>
-          <span className="text-white font-bold drop-shadow-md">{player.name}</span>
           
-          {/* Player Cards (Hand) */}
+          {/* Player Cards (Hand) - Only for Bottom Player */}
           {positions[i] === 'bottom' && (
-            <div className="flex gap-1 mt-4">
-              {player.cards.map((card, idx) => (
-                <CardComponent key={idx} card={card} />
+            <div className="flex gap-[-10px] mt-2 justify-center w-full max-w-md px-4">
+              {[1, 2, 3, 4, 5].map((_, idx) => (
+                <div key={idx} className="-ml-4 first:ml-0 transition-transform hover:-translate-y-4">
+                   <CardComponent card={{ suit: 'CLUBS', rank: '9' }} />
+                </div>
               ))}
             </div>
+          )}
+
+          {/* Opponent Cards (Hidden) */}
+          {positions[i] !== 'bottom' && (
+             <div className="flex -gap-2 scale-50 opacity-50">
+                <div className="w-10 h-14 bg-[#4a4a4a] border border-white/20 rounded-md shadow-sm"></div>
+                <div className="w-10 h-14 bg-[#4a4a4a] border border-white/20 rounded-md shadow-sm -ml-6"></div>
+             </div>
           )}
         </div>
       ))}
 
-      {/* Table Cards (Played) */}
-      <div className="relative w-48 h-48 flex items-center justify-center">
-        <AnimatePresence>
-          {tableCards.map((played, idx) => (
-            <motion.div
-              key={`${played.playerId}-${idx}`}
-              initial={{ scale: 0, opacity: 0, y: 100 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              className="absolute"
-            >
-              <CardComponent card={played.card} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+      {/* Table Center (Played Cards) */}
+      <div className="relative w-40 h-40 flex items-center justify-center">
+        <div className="absolute top-0 transform -translate-y-4">
+           <CardComponent card={{ suit: 'SPADES', rank: 'JACK' }} isSmall />
+        </div>
+        <div className="absolute right-0 transform translate-x-4">
+           <CardComponent card={{ suit: 'DIAMONDS', rank: 'ACE' }} isSmall />
+        </div>
+        <div className="absolute bottom-0 transform translate-y-4">
+           <CardComponent card={{ suit: 'CLUBS', rank: '9' }} isSmall />
+        </div>
+        <div className="absolute left-0 transform -translate-x-4">
+           <CardComponent card={{ suit: 'HEARTS', rank: '10' }} isSmall />
+        </div>
       </div>
     </div>
   );
 };
 
-const CardComponent = ({ card }: { card: Card }) => {
+const CardComponent = ({ card, isSmall }: { card: Card; isSmall?: boolean }) => {
   const isRed = card.suit === 'HEARTS' || card.suit === 'DIAMONDS';
   const suitSymbols: Record<string, string> = {
     SPADES: '♠', HEARTS: '♥', DIAMONDS: '♦', CLUBS: '♣'
@@ -82,17 +95,16 @@ const CardComponent = ({ card }: { card: Card }) => {
 
   return (
     <motion.div 
-      whileHover={{ y: -10 }}
-      className="w-16 h-24 bg-white rounded-lg shadow-md flex flex-col items-center justify-between p-2 cursor-pointer border border-gray-200 select-none"
+      className={`${isSmall ? 'w-12 h-18' : 'w-16 h-24'} bg-white rounded-lg shadow-xl flex flex-col items-center justify-between p-1.5 cursor-pointer border border-gray-300 select-none relative overflow-hidden`}
     >
-      <div className={`self-start text-lg font-bold ${isRed ? 'text-red-600' : 'text-black'}`}>
-        {card.rank}
+      <div className={`self-start text-xs font-bold ${isRed ? 'text-red-600' : 'text-black'}`}>
+        {card.rank[0]}
       </div>
-      <div className={`text-3xl ${isRed ? 'text-red-600' : 'text-black'}`}>
+      <div className={`text-xl ${isRed ? 'text-red-600' : 'text-black'}`}>
         {suitSymbols[card.suit]}
       </div>
-      <div className={`self-end text-lg font-bold rotate-180 ${isRed ? 'text-red-600' : 'text-black'}`}>
-        {card.rank}
+      <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none scale-150">
+         {suitSymbols[card.suit]}
       </div>
     </motion.div>
   );
