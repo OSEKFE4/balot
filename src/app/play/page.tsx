@@ -2,13 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 
-// --- Baloot Rules & Values ---
+// --- Baloot Rules, Values & Power ---
 const SUITS = ['♠', '♥', '♦', '♣'];
 const RANKS = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-const CARD_VALUES_SUN: Record<string, number> = {
-  'A': 11, '10': 10, 'K': 4, 'Q': 3, 'J': 2, '9': 0, '8': 0, '7': 0
-};
+// Card values for scoring
+const CARD_VALUES_SUN: Record<string, number> = { 'A': 11, '10': 10, 'K': 4, 'Q': 3, 'J': 2, '9': 0, '8': 0, '7': 0 };
+const CARD_VALUES_HUKM: Record<string, number> = { 'J': 20, '9': 14, 'A': 11, '10': 10, 'K': 4, 'Q': 3, '8': 0, '7': 0 };
+
+// Card power for winning tricks (Higher is better)
+const CARD_POWER_SUN: Record<string, number> = { 'A': 8, '10': 7, 'K': 6, 'Q': 5, 'J': 4, '9': 3, '8': 2, '7': 1 };
+const CARD_POWER_HUKM: Record<string, number> = { 'J': 8, '9': 7, 'A': 6, '10': 5, 'K': 4, 'Q': 3, '8': 2, '7': 1 };
 
 const createBalootDeck = () => {
   let deck: any[] = [];
@@ -18,12 +22,16 @@ const createBalootDeck = () => {
         suit, 
         rank, 
         color: (suit === '♥' || suit === '♦') ? '#e11d48' : '#111',
-        id: Math.random().toString(36).substr(2, 9),
-        value: CARD_VALUES_SUN[rank] || 0
+        id: Math.random().toString(36).substr(2, 9)
       });
     });
   });
-  return deck.sort(() => Math.random() - 0.5);
+  // Real Random Shuffle
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  return deck;
 };
 
 export default function BalootGame() {
@@ -31,7 +39,8 @@ export default function BalootGame() {
   const [isDealing, setIsDealing] = useState(false);
   const [myCards, setMyCards] = useState<any[]>([]);
   const [tableCards, setTableCards] = useState<any[]>([]);
-  const [turn, setTurn] = useState(0); 
+  const [dealer, setDealer] = useState(0); // 0: Me, 1: Khalid, 2: Fahad, 3: Sultan
+  const [turn, setTurn] = useState(1); 
   const [gameStatus, setGameStatus] = useState('WAITING');
   const [scores, setScores] = useState([0, 0]);
   const [roundPoints, setRoundPoints] = useState([0, 0]);
@@ -45,6 +54,15 @@ export default function BalootGame() {
   const [buyer, setBuyer] = useState<number | null>(null);
   const [gameType, setGameType] = useState<'SUN' | 'HUKM' | null>(null);
   const [deck, setDeck] = useState<any[]>([]);
+
+  // Voice Announcement System
+  const playVoice = (text: string) => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'ar-SA';
+      window.speechSynthesis.speak(msg);
+    }
+  };
 
   // Initial Game Setup - Stage 1 (Dealing 5 cards and UpCard)
   const startNewGame = async () => {
@@ -63,18 +81,20 @@ export default function BalootGame() {
     const newDeck = createBalootDeck();
     setDeck(newDeck);
     
-    // Deal 5 cards to me
+    // Dealing 5 cards (Simulated sequence)
     for (let i = 0; i < 5; i++) {
       await new Promise(r => setTimeout(r, 200));
       setMyCards(prev => [...prev, newDeck[i]]);
     }
     
-    // Set UpCard (the 21st card usually, but here we take the next one)
     setUpCard(newDeck[20]);
-    
     setIsDealing(false);
     setGameStatus('BIDDING');
-    setTurn(0); // Bidding starts from player after dealer (simplified to start from me)
+    
+    // Start bidding from player to the right of dealer
+    const firstBidder = (dealer + 1) % 4;
+    setTurn(firstBidder);
+    playVoice("أول");
   };
 
   // Bot Bidding Logic
@@ -174,21 +194,46 @@ export default function BalootGame() {
   };
 
   const calculateTrickWinner = (cards: any[]) => {
-    const totalTrickPoints = cards.reduce((sum, c) => sum + c.value, 0);
-    // Simplified winner logic: first player of trick wins for now
-    const winnerPos = Math.floor(Math.random() * 4); 
-    const teamIndex = (winnerPos === 0 || winnerPos === 2) ? 0 : 1;
+    const leadSuit = cards[0].suit;
+    let winnerIdx = 0;
+    let maxPower = -1;
 
+    cards.forEach((c, index) => {
+      let power = 0;
+      if (gameType === 'SUN') {
+        power = (c.suit === leadSuit) ? CARD_POWER_SUN[c.rank] : 0;
+      } else {
+        // HUKM logic (simplified: upcard suit is trump)
+        const trumpSuit = upCard.suit;
+        if (c.suit === trumpSuit) {
+          power = CARD_POWER_HUKM[c.rank] + 100; // Trump always wins over others
+        } else if (c.suit === leadSuit) {
+          power = CARD_POWER_SUN[c.rank];
+        }
+      }
+      
+      if (power > maxPower) {
+        maxPower = power;
+        winnerIdx = index;
+      }
+    });
+
+    const winnerPos = cards[winnerIdx].pos;
+    const totalPoints = cards.reduce((sum, c) => {
+      const valMap = (gameType === 'SUN') ? CARD_VALUES_SUN : (c.suit === upCard.suit ? CARD_VALUES_HUKM : CARD_VALUES_SUN);
+      return sum + (valMap[c.rank] || 0);
+    }, 0);
+
+    const teamIndex = (winnerPos === 0 || winnerPos === 2) ? 0 : 1;
     setRoundPoints(prev => {
       const next = [...prev];
-      next[teamIndex] += totalTrickPoints;
+      next[teamIndex] += totalPoints;
       return next;
     });
 
     setTableCards([]);
     setTurn(winnerPos);
 
-    // If hand is empty, show Nashra
     if (myCards.length === 0 && !isDealing) {
       finishRound();
     }
@@ -197,6 +242,7 @@ export default function BalootGame() {
   const finishRound = () => {
     setGameStatus('FINISHED');
     setScores(prev => [prev[0] + roundPoints[0], prev[1] + roundPoints[1]]);
+    setDealer(prev => (prev + 1) % 4); // Move dealer for next round
     setShowNashra(true);
   };
 
