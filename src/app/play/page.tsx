@@ -100,32 +100,39 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#064e3b] flex flex-col items-center justify-start p-4 md:p-8 relative overflow-x-hidden">
-      {/* Background texture */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]"></div>
+    <div className="min-h-screen bg-[#1a4d2e] flex flex-col items-center justify-start p-2 md:p-8">
+      {/* Heavy texture background */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
 
-      <div className="w-full max-w-6xl z-10 flex flex-col gap-6">
-        {/* Header Stats */}
-        <div className="flex justify-between items-center bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-xl">
-          <div className="flex flex-col items-center">
-            <span className="text-white/60 text-xs mb-1">فريقنا</span>
-            <span className="text-secondary text-2xl font-black">{gameState.scores[0]}</span>
-          </div>
-          <div className="text-center">
-            <h2 className="text-secondary font-black text-xl mb-1">أبو هذال</h2>
-            <div className="px-4 py-1 bg-white/10 rounded-full text-white/80 text-xs font-bold uppercase tracking-widest">
-              {gameState.status}
+      <div className="w-full max-w-7xl z-10 flex flex-col gap-4">
+        {/* Modern Score Bar */}
+        <div className="flex justify-between items-center bg-black/50 backdrop-blur-xl p-5 rounded-3xl border border-white/10 shadow-2xl">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center bg-white/5 px-4 py-1 rounded-xl">
+              <span className="text-white/40 text-[10px] font-bold">فريقنا</span>
+              <span className="text-secondary text-2xl font-black leading-none">{gameState.scores[0]}</span>
             </div>
           </div>
+
           <div className="flex flex-col items-center">
-            <span className="text-white/60 text-xs mb-1">فريقهم</span>
-            <span className="text-secondary text-2xl font-black">{gameState.scores[1]}</span>
+            <h2 className="text-secondary font-black text-2xl tracking-tighter">أبو هذال</h2>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <span className="text-white/80 text-[10px] font-bold uppercase">{gameState.status}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center bg-white/5 px-4 py-1 rounded-xl">
+              <span className="text-white/40 text-[10px] font-bold">فريقهم</span>
+              <span className="text-secondary text-2xl font-black leading-none">{gameState.scores[1]}</span>
+            </div>
           </div>
         </div>
 
-        {/* Main Game Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-          <div className="lg:col-span-3 w-full">
+        {/* Game Layout Container */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-[3]">
             <GameBoard 
               players={gameState.players}
               tableCards={gameState.tableCards}
@@ -133,16 +140,16 @@ export default function PlayPage() {
             />
           </div>
           
-          <div className="w-full lg:col-span-1 h-full">
+          <div className="flex-[1] h-[400px] lg:h-auto min-h-[400px]">
             <Chat />
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex gap-4 justify-center mt-4">
-          <button className="btn-primary shadow-[0_0_20px_rgba(212,175,55,0.3)]">صن</button>
-          <button className="bg-primary-dark text-white border-2 border-secondary font-bold py-2 px-8 rounded-full hover:bg-secondary hover:text-primary-dark transition-all">حكم</button>
-          <button className="bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/50 font-bold py-2 px-8 rounded-full transition-all">بس</button>
+        {/* Control Panel */}
+        <div className="flex gap-4 justify-center bg-black/30 p-4 rounded-full backdrop-blur-md border border-white/5">
+          <button className="bg-secondary text-primary-dark font-black px-10 py-3 rounded-full shadow-lg hover:scale-105 transition-transform active:scale-95">صن</button>
+          <button className="bg-white/10 text-white font-black px-10 py-3 rounded-full border border-white/20 hover:bg-white/20 transition-all">حكم</button>
+          <button className="bg-red-500/10 text-red-500 font-black px-10 py-3 rounded-full border border-red-500/20 hover:bg-red-500 hover:text-white transition-all">بس</button>
         </div>
       </div>
     </div>
