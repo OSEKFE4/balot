@@ -42,6 +42,34 @@ export const getCardValue = (card: Card, type: GameType, trumpSuit?: CardSuit): 
         'ACE': 11, '10': 10, 'KING': 4, 'QUEEN': 3, 'JACK': 2, '9': 0, '8': 0, '7': 0
       };
       return values[rank];
+    }
+  }
+};
+
+export const getCardPower = (card: Card, type: GameType, trumpSuit?: CardSuit, leadSuit?: CardSuit): number => {
+  const { rank, suit } = card;
+  
+  if (type === 'SUN') {
+    const powers: Record<CardRank, number> = {
+      'ACE': 8, '10': 7, 'KING': 6, 'QUEEN': 5, 'JACK': 4, '9': 3, '8': 2, '7': 1
+    };
+    return suit === leadSuit ? powers[rank] : -1;
+  } else {
+    // HUKM
+    if (suit === trumpSuit) {
+      const powers: Record<CardRank, number> = {
+        'JACK': 16, '9': 15, 'ACE': 14, '10': 13, 'KING': 12, 'QUEEN': 11, '8': 10, '7': 9
+      };
+      return powers[rank];
+    } else {
+      const powers: Record<CardRank, number> = {
+        'ACE': 8, '10': 7, 'KING': 6, 'QUEEN': 5, 'JACK': 4, '9': 3, '8': 2, '7': 1
+      };
+      return suit === leadSuit ? powers[rank] : -1;
+    }
+  }
+};
+
 export const isValidMove = (
   card: Card,
   playerHand: Card[],
@@ -88,28 +116,4 @@ export const calculateTrickWinner = (
   }
 
   return winner.playerId;
-};
-
-export const getCardPower = (card: Card, type: GameType, trumpSuit?: CardSuit, leadSuit?: CardSuit): number => {
-  const { rank, suit } = card;
-  
-  if (type === 'SUN') {
-    const powers: Record<CardRank, number> = {
-      'ACE': 8, '10': 7, 'KING': 6, 'QUEEN': 5, 'JACK': 4, '9': 3, '8': 2, '7': 1
-    };
-    return suit === leadSuit ? powers[rank] : -1;
-  } else {
-    // HUKM
-    if (suit === trumpSuit) {
-      const powers: Record<CardRank, number> = {
-        'JACK': 16, '9': 15, 'ACE': 14, '10': 13, 'KING': 12, 'QUEEN': 11, '8': 10, '7': 9
-      };
-      return powers[rank];
-    } else {
-      const powers: Record<CardRank, number> = {
-        'ACE': 8, '10': 7, 'KING': 6, 'QUEEN': 5, 'JACK': 4, '9': 3, '8': 2, '7': 1
-      };
-      return suit === leadSuit ? powers[rank] : -1;
-    }
-  }
 };
