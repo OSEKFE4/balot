@@ -25,8 +25,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({ players, tableCards, curre
   const positions = ['bottom', 'left', 'top', 'right'];
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
-      {/* Players */}
+    <div className="relative w-full h-full flex items-center justify-center min-h-[400px]">
+      {/* Sadu Carpet In Center */}
+      <div className="absolute w-[240px] h-[240px] md:w-[320px] md:h-[320px] bg-[#8b0000] rounded-xl shadow-2xl flex items-center justify-center overflow-hidden border-[8px] border-[#d4af37]/20">
+         <div className="w-full h-full opacity-40 bg-[repeating-linear-gradient(0deg,_#000,_#000_5px,_#8b0000_5px,_#8b0000_10px)]"></div>
+         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+         <div className="z-10 bg-white/95 px-6 py-2 rounded-lg shadow-xl border border-black/10">
+            <span className="text-[#1a4d2e] font-black text-lg md:text-xl">استوى الورق</span>
+         </div>
+      </div>
       {rotatedPlayers.map((player, i) => (
         <div 
           key={player.id}

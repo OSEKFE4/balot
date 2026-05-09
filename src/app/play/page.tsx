@@ -102,57 +102,46 @@ export default function PlayPage() {
   return (
     <div className="min-h-screen bg-[#e8e1d5] flex flex-col items-center justify-between p-0 relative overflow-hidden font-sans">
       {/* Top Bar - Score and Menu */}
-      <div className="w-full bg-[#4a4a4a] text-white p-2 flex flex-col gap-1 shadow-lg z-50">
+      <div className="w-full bg-[#3a3a3a] text-white p-2 flex flex-col gap-1 shadow-lg z-50 border-b border-black/20">
         <div className="flex justify-between items-center px-4">
           <div className="flex gap-4">
-            <div className="flex flex-col items-center opacity-70">
-              <div className="bg-white/10 p-1 rounded-md"><Chat size={16} /></div>
-              <span className="text-[10px]">تقارير</span>
+            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
+              <div className="bg-white/10 p-1.5 rounded-lg"><Chat size={18} /></div>
+              <span className="text-[9px] mt-0.5">الدردشة</span>
             </div>
-            <div className="flex flex-col items-center opacity-70">
-              <div className="bg-white/10 p-1 rounded-md"><Users size={16} /></div>
-              <span className="text-[10px]">مشاركة</span>
+            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
+              <div className="bg-white/10 p-1.5 rounded-lg"><Users size={18} /></div>
+              <span className="text-[9px] mt-0.5">مشاركة</span>
             </div>
           </div>
 
-          <div className="flex items-center bg-black/40 rounded-xl px-4 py-1 gap-4 border border-white/10">
-            <div className="flex flex-col items-center border-l border-white/20 pl-4">
-              <span className="text-[10px] text-white/60">لنا</span>
-              <span className="text-xl font-black text-white">{gameState.scores[0]}</span>
+          <div className="flex items-center bg-[#2a2a2a] rounded-2xl px-6 py-1.5 gap-6 border-2 border-white/5 shadow-inner">
+            <div className="flex flex-col items-center border-l-2 border-white/10 pl-6">
+              <span className="text-[10px] text-white/40 font-bold">لنا</span>
+              <span className="text-2xl font-black text-white leading-none">{gameState.scores[0]}</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-[10px] text-white/60">لهم</span>
-              <span className="text-xl font-black text-white">{gameState.scores[1]}</span>
+              <span className="text-[10px] text-white/40 font-bold">لهم</span>
+              <span className="text-2xl font-black text-white leading-none">{gameState.scores[1]}</span>
             </div>
           </div>
 
           <div className="flex gap-4">
-            <div className="flex flex-col items-center opacity-70">
-              <div className="bg-white/10 p-1 rounded-md"><Trophy size={16} /></div>
-              <span className="text-[10px]">التصويت</span>
+            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
+              <div className="bg-white/10 p-1.5 rounded-lg"><Trophy size={18} /></div>
+              <span className="text-[9px] mt-0.5">البطولات</span>
             </div>
-            <div className="flex flex-col items-center opacity-70">
-              <div className="bg-white/10 p-1 rounded-md"><Play size={16} /></div>
-              <span className="text-[10px]">التمرين</span>
+            <div className="flex flex-col items-center opacity-80 hover:opacity-100 cursor-pointer">
+              <div className="bg-white/10 p-1.5 rounded-lg"><Play size={18} /></div>
+              <span className="text-[9px] mt-0.5">خروج</span>
             </div>
           </div>
         </div>
-        <div className="text-center text-[10px] text-white/40">جلسة 9656 | 10</div>
       </div>
 
       {/* Main Table Area */}
-      <div className="flex-1 w-full relative flex items-center justify-center p-4">
-        {/* Sadu Pattern Carpet */}
-        <div className="absolute w-[300px] h-[300px] bg-[#8b0000] border-[12px] border-[#d4af37]/30 rounded-xl shadow-2xl flex items-center justify-center overflow-hidden">
-          <div className="w-full h-full opacity-30 bg-[repeating-linear-gradient(0deg,_#000,_#000_10px,_#8b0000_10px,_#8b0000_20px)]"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-             <div className="bg-white/90 px-6 py-2 rounded-md shadow-lg z-20">
-                <span className="text-primary-dark font-black text-xl">استوى الورق</span>
-             </div>
-          </div>
-        </div>
-
-        <div className="w-full h-full max-w-lg z-10">
+      <div className="flex-1 w-full relative flex items-center justify-center p-2">
+        <div className="w-full h-full max-w-2xl z-10 flex items-center justify-center">
           <GameBoard 
             players={gameState.players}
             tableCards={gameState.tableCards}
