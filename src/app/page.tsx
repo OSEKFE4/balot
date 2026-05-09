@@ -65,18 +65,17 @@ export default function Home() {
 
         <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
           <Link 
-            href={user ? "/play" : "#"} 
-            onClick={(e) => {
-              if (!user) {
-                e.preventDefault();
-                setShowAuth(true);
-              }
-            }}
+            href="/play" 
             className="btn-primary text-xl px-12 py-4"
           >
-            العب الآن
+            لعب كضيف
           </Link>
-        </div>
+          <button 
+            onClick={() => setShowAuth(true)}
+            className="text-white hover:text-secondary transition-colors font-bold text-lg"
+          >
+            تسجيل الدخول / إنشاء حساب
+          </button>
 
         {/* Features Preview */}
         <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">

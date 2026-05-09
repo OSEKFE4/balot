@@ -36,6 +36,7 @@ export default function BalootGame() {
   const [scores, setScores] = useState([0, 0]); // لنا، لهم
   const [roundPoints, setRoundPoints] = useState([0, 0]);
   const [showNashra, setShowNashra] = useState(false);
+  const [project, setProject] = useState<string | null>(null);
 
   // Animated Dealing Sequence (3-2)
   const startNewGame = async () => {
@@ -45,6 +46,7 @@ export default function BalootGame() {
     setMyCards([]);
     setTableCards([]);
     setRoundPoints([0, 0]);
+    setProject(null);
     
     const deck = createBalootDeck();
     
@@ -54,9 +56,21 @@ export default function BalootGame() {
       setMyCards(prev => [...prev, deck[i]]);
     }
     
+    // Check for Projects (Mock for now)
+    const projects = ['سرا', 'خمسين', 'مية', 'اربعمية'];
+    if (Math.random() > 0.7) {
+      setTimeout(() => setProject(projects[Math.floor(Math.random() * projects.length)]), 1000);
+    }
+
     setIsDealing(false);
     setGameStatus('PLAYING');
     setTurn(0);
+  };
+
+  const copyInviteLink = () => {
+    const link = window.location.href;
+    navigator.clipboard.writeText(link);
+    alert('تم نسخ رابط الدعوة! أرسله لصديقك ليلعب معك كضيف.');
   };
 
   // Bot Logic with Point Calculation
@@ -163,8 +177,8 @@ export default function BalootGame() {
       {/* Top Bar */}
       <div style={{ backgroundColor: '#333', color: 'white', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '60px', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
         <div style={{ display: 'flex', gap: '15px', fontSize: '12px', opacity: 0.8 }}>
-           <span>💬 الدردشة</span>
-           <span>👥 مشاركة</span>
+           <span onClick={copyInviteLink} style={{ cursor: 'pointer', color: '#d4af37', fontWeight: 'bold' }}>� دعوة صديق</span>
+           <span>� الدردشة</span>
         </div>
         <div style={{ display: 'flex', backgroundColor: 'rgba(0,0,0,0.6)', padding: '5px 25px', borderRadius: '12px', gap: '30px', border: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ textAlign: 'center' }}><div style={{ color: '#aaa', fontSize: '10px' }}>لنا</div><div style={{ fontSize: '24px', fontWeight: '900', color: '#d4af37' }}>{scores[0]}</div></div>
@@ -180,8 +194,15 @@ export default function BalootGame() {
         <div style={{ width: '320px', height: '320px', backgroundColor: '#8b0000', borderRadius: '25px', position: 'relative', border: '10px solid #c4a484', boxShadow: '0 30px 60px rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
            <div style={{ position: 'absolute', inset: 0, opacity: 0.3, background: 'repeating-linear-gradient(0deg, #000, #000 5px, #8b0000 5px, #8b0000 10px)' }}></div>
            
-           <div style={{ backgroundColor: 'rgba(255,255,255,0.95)', padding: '10px 25px', borderRadius: '8px', fontWeight: '900', color: '#1a4d2e', zIndex: 10, fontSize: '18px', boxShadow: '0 5px 15px rgba(0,0,0,0.2)' }}>
+           <div style={{ backgroundColor: 'rgba(255,255,255,0.95)', padding: '10px 25px', borderRadius: '8px', fontWeight: '900', color: '#1a4d2e', zIndex: 10, fontSize: '18px', boxShadow: '0 5px 15px rgba(0,0,0,0.2)', position: 'relative' }}>
               {isDealing ? 'جارِ التوزيع...' : (turn === 0 ? 'دورك' : 'دور الخصم...')}
+              
+              {/* Projects Indicator */}
+              {project && (
+                <div style={{ position: 'absolute', top: '-50px', left: '50%', transform: 'translateX(-50%)', backgroundColor: '#d4af37', color: 'white', padding: '5px 15px', borderRadius: '10px', fontSize: '14px', animation: 'bounce 1s infinite', whiteSpace: 'nowrap' }}>
+                  مشروع: {project} ✨
+                </div>
+              )}
            </div>
            
            {/* Center Cards (Played) */}
