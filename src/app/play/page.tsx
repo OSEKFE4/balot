@@ -24,12 +24,20 @@ export default function PlayPage() {
     const savedUser = localStorage.getItem('currentUser');
     const userData = savedUser ? JSON.parse(savedUser) : { name: 'لاعب' };
 
-    const newSocket = io('http://localhost:3001');
+    // Use current window location for socket if not localhost
+    const socketUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+      ? 'http://localhost:3001' 
+      : window.location.origin;
+
+    const newSocket = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5
+    });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
+      console.log('Connected to socket');
       newSocket.emit('join_game', '1234', { name: userData.name });
-      setIsJoined(true);
     });
 
     newSocket.on('game_update', (updatedState: GameState) => {
@@ -49,9 +57,27 @@ export default function PlayPage() {
   }, []);
 
   const handleJoin = (name: string, roomId: string) => {
-    if (socket) {
+    setIsJoined(true); // Switch UI immediately
+    if (socket && socket.connected) {
       socket.emit('join_game', roomId, { name });
-      setIsJoined(true);
+    } else {
+      // Mock data if socket is not connected
+      setGameState(prev => ({
+        ...prev,
+        players: [
+          { id: 'me', name: name || 'أنت', cards: [
+            { suit: 'HEARTS', rank: 'ACE' },
+            { suit: 'SPADES', rank: '10' },
+            { suit: 'CLUBS', rank: 'JACK' },
+            { suit: 'DIAMONDS', rank: '9' },
+            { suit: 'HEARTS', rank: 'KING' },
+          ], team: 0 },
+          { id: '2', name: 'خالد (بوت)', cards: [], team: 1 },
+          { id: '3', name: 'فهد (بوت)', cards: [], team: 0 },
+          { id: '4', name: 'سلطان (بوت)', cards: [], team: 1 },
+        ],
+        status: 'PLAYING'
+      }));
     }
   };
 
